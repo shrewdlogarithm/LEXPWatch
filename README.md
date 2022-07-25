@@ -17,7 +17,8 @@ This is an ongoing XP earned message (Work in Progress - suggestions welcome!)
 `2022-07-25 20:54:52 Thymp 486028 802  2181671 xp/hr`
 
 Character Thymp has earned 486028XP in 802 seconds which is 2181671xp/hr
-Note: This reflects time spent in areas where you earned XP - it ignores time spent in hubs where no XP was earned
+
+*Note: This counts time spent in areas where you earned XP - it ignores time spent in hubs where no XP was earned*
 
 ### How it does it ###
 Python Code - I've tried to avoid using external dependencies - I think it should 'just work'
