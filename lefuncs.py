@@ -1,6 +1,8 @@
 import glob,os,json,re,time
 import utils
 
+watching=True
+
 # Load/Initialize Settings
 path = os.getenv("USERPROFILE")
 if path: # Windows
@@ -48,10 +50,6 @@ def getchardb(sslot):
             return chardb
     except Exception as e:        
         raise FileClashException(f"Failed to read saveslot {sslot}")
-
-from datetime import datetime
-
-watching=True
 
 # Find last played character slot
 lastsslot = ["0",0]
