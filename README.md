@@ -5,6 +5,20 @@ This is VERY much work-in-progress - sharing for feedback/ideas!
 ### What it Does ###
 It monitors your Player.log/save slots and reports how much XP you're earning when playing and specifically in each 'area' you enter/leave
 
+### Sample Output ###
+This is a zone-change message
+
+`2022-07-25 20:54:52 - EoT          - Thymp(78+46.6%) Earned 31601xp in 75.00secs @25280xp/min @1.0lvl/hr`
+
+Character Thymp Level 78, 46.6% of the way to Level 79 - earned 21601 XP in the last area (EoT is 'End of Time' where I've just arrived) at the rates shown
+
+This is an ongoing XP earned message (Work in Progress - suggestions welcome!)
+
+`2022-07-25 20:54:52 Thymp 486028 802  2181671 xp/hr`
+
+Character Thymp has earned 486028XP in 802 seconds which is 2181671xp/hr
+Note: This reflects time spent in areas where you earned XP - it ignores time spent in hubs where no XP was earned
+
 ### How it does it ###
 Python Code - I've tried to avoid using external dependencies - I think it should 'just work'
 
