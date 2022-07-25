@@ -17,7 +17,7 @@ def checkchar(last,slot,timenow):
         if last[1] == level:
             totalxp = charxp-last[2]
         else:
-            totalxp = lefuncs.levelxp[last[1]]-last[2]+charxpi
+            totalxp = lefuncs.levelxp[last[1]]-last[2]+charxp
     return currcharname,level,charxp,intvl,totalxp
 
 lastzone = [0,0,0]
