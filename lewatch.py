@@ -1,15 +1,12 @@
 from datetime import datetime
 import time
-import lefuncs,utils
 
-class FileClashException(Exception):
-    def __init__(self, message='Key Empty'):
-        super(FileClashException, self).__init__(message)
+print("Last Epoch Watcher Active")
+
+import lefuncs,utils
 
 def checkchar(last,slot,timenow):
     chardb = lefuncs.getchardb(slot)
-    if "characterName" not in chardb:
-        raise FileClashException("Slot" + slot)
     currcharname = chardb["characterName"]
     level = int(chardb["level"])
     charxp = int(chardb["currentExp"])
@@ -35,7 +32,7 @@ def newzone(zone):
             pl = totalxp/intvl*60*60/lefuncs.levelxp[level]
             print(timenow.strftime('%Y-%m-%d %H:%M:%S')," - ", zone.ljust(12," "), " - ", currcharname, "(", level, "+", "%.1f" % lp, "%) Earned ", totalxp, "xp in ", "%.2f" % intvl, "secs @", xppm, "xp/min ", "@", "%.1f" % pl,"lvl/hr",sep="")
         lastzone=[timenow,level,charxp]
-    except FileClashException as e:
+    except lefuncs.FileClashException as e:
         pass # likely trying to read file whilst game is writing it
 utils.addcb("zone",newzone)
 newzone("Initialize")
@@ -58,11 +55,9 @@ def trackchar(sslot):
                     ccplaytime += intvl
                     print(timenow.strftime('%Y-%m-%d %H:%M:%S'),currcharname,ccxp,ccplaytime,"%8d" % (ccxp/ccplaytime*60*60),"xp/hr")
         lastchar = [timenow,level,charxp,currcharname]
-    except FileClashException as e:
+    except lefuncs.FileClashException as e:
         pass # trying to read file whilst game is writing it
 utils.addcb("save",trackchar)
-
-print("Last Epoch Watcher Active")
 
 while lefuncs.iswatching():
     time.sleep(lefuncs.settings["quitdelay"])

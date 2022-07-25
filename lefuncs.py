@@ -33,6 +33,10 @@ def getsavefile(sslot):
     else:
         return settings["ledir"] + "/Saves/1CHARACTERSLOT_BETA_" + sslot    
 
+class FileClashException(Exception):
+    def __init__(self, message='Key Empty'):
+        super(FileClashException, self).__init__(message)
+
 # Load character data from savefile for slot
 def getchardb(sslot):
     chardb={}
@@ -41,11 +45,14 @@ def getchardb(sslot):
         with open(savefile,"r") as f:
             listo = f.read()[5:]
             chardb = json.loads(listo)    
-    except Exception as e:
-        pass # we may be reading the savefile as the game is...
-    return chardb
+            return chardb
+    except Exception as e:        
+        raise FileClashException(f"Failed to read saveslot {sslot}")
 
 from datetime import datetime
+
+watching=True
+
 # Find last played character slot
 lastsslot = ["0",0]
 def checklastsslot(): 
@@ -66,7 +73,6 @@ def checklastsslot():
 checklastsslot()
 
 # Monitor Log and Save Files
-watching=True
 def iswatching():
     return watching
 @utils.background
@@ -95,8 +101,8 @@ def watchlog():
                 sline = f.tell() # move pointer to EOF
                 time.sleep(settings["zonedelay"])
         except Exception as e:
-            print("Cannot find Player.log - check path in settings.json")
-            watching=False
+            print("Error in watchlog",e,type(e))
+            time.sleep(1)
 watchlog() 
 
 @utils.background
@@ -110,9 +116,8 @@ def watchsave():
                 if upd != lastupd:
                     utils.runcb("save",lastsslot[0])
                 lastupd = upd            
-    except:
-        print("Cannot find file for save slot - check path in settings.json",lastsslot[0])
-        watching=False
+    except Exception as e:
+        print("Error in watchsave",e,type(e))
     time.sleep(settings["savedelay"])
 watchsave()
 
