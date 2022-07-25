@@ -2,24 +2,54 @@ import glob,os,json,re,time
 import utils
 
 # Load/Initialize Settings
-settings = {}
+path = os.getenv("USERPROFILE")
+if path: # Windows
+    path = path + "/appdata/locallow/"
+else:
+    path = os.getenv("HOME") + "/.config/unity3d/"
+settings = {
+        "ledir": path + "/Eleventh Hour Games/Last Epoch/",
+        "zonedelay": 5,
+        "savedelay": 5,
+        "quitdelay": 5
+}      
 try:
     with open("settings.json","r") as f:
-        settings = json.load(f)    
+        settings = {**settings,**json.load(f)}
 except Exception as e:
-    path = os.getenv("USERPROFILE")
-    if path: # Windows
-        path = path + "/appdata/locallow/"
-    else:
-        path = os.getenv("HOME") + "/.config/unity3d/"
-    settings = {
-        "ledir": path + "/Eleventh Hour Games/Last Epoch/"
-    }      
-with open("settings.json","w") as f:
-    json.dump(settings,f,indent=4)
+    pass
+        
+def save_settings():
+    with open("settings.json","w") as f:
+        json.dump(settings,f,indent=4)
+save_settings()
 
+testfile = False
+if os.path.exists("testchar.txt"):
+    testfile = True
+def getsavefile(sslot):
+    if testfile:
+        return "testchar.txt"
+    else:
+        return settings["ledir"] + "/Saves/1CHARACTERSLOT_BETA_" + sslot    
+
+# Load character data from savefile for slot
+def getchardb(sslot):
+    chardb={}
+    try:
+        savefile = getsavefile(sslot)
+        with open(savefile,"r") as f:
+            listo = f.read()[5:]
+            chardb = json.loads(listo)    
+    except Exception as e:
+        pass # we may be reading the savefile as the game is...
+    return chardb
+
+from datetime import datetime
 # Find last played character slot
-def getlastcharslot(): # finds last-played character slot
+lastsslot = ["0",0]
+def checklastsslot(): 
+    global lastsslot,watching
     mrecent = 0
     mrfile = "0"
     f = glob.glob(settings["ledir"] + "Saves/1*")
@@ -28,19 +58,14 @@ def getlastcharslot(): # finds last-played character slot
         if mtime > mrecent:
             mrecent = mtime
             mrfile = fl    
-    return re.findall(r'\d+', mrfile)[-1] # last number in filename or 0 if not found
+    if mrfile != "0":
+        lastsslot = [re.findall(r'\d+', mrfile)[-1],mrecent]
+    else:
+        print("Cannot find any character saves - check path in settings.json")
+        watching = False
+checklastsslot()
 
-# Load character data from savefile for slot
-def getchardb(sslot):
-    savefile = "testchar.txt"
-    if not os.path.exists(savefile): # local debug file
-        savefile = settings["ledir"] + "/Saves/1CHARACTERSLOT_BETA_" + sslot    
-    with open(savefile,"r") as f:
-        listo = f.read()[5:]
-        chardb = json.loads(listo)    
-    return chardb
-
-# Monitor Log File
+# Monitor Log and Save Files
 watching=True
 def iswatching():
     return watching
@@ -49,11 +74,11 @@ def watchlog():
     global watching
     firstime = True
     sline = 0
+    logfile = "testlog.txt"
+    if not os.path.exists(logfile): # local debug file
+        logfile = settings["ledir"] + "Player.log"
     while watching:
         try:
-            logfile = "testlog.txt"
-            if not os.path.exists(logfile): # local debug file
-                logfile = settings["ledir"] + "Player.log"
             with open(logfile,"r") as f:
                 f.seek(0,2) # goto EOF
                 if f.tell() < sline: # file shorter than at last check 
@@ -63,17 +88,33 @@ def watchlog():
                 if not firstime: # we ignore what was in the file before this program was run
                     for ln in nlines:
                         op = ln.strip() # remove newlines etc.
-                        if len(op) > 0: # ignore blanklines
+                        if len(op) > 0: # ignore blanklines                            
                             utils.runcb("log",op)
                 else:
                     firstime = False
                 sline = f.tell() # move pointer to EOF
-                time.sleep(1)
+                time.sleep(settings["zonedelay"])
         except Exception as e:
-            print(e)
-            print("Last Epoch Log File not found - check settings.json")
+            print("Cannot find Player.log - check path in settings.json")
             watching=False
-watchlog() # start background watcher
+watchlog() 
+
+@utils.background
+def watchsave():
+    global watching
+    try:
+        lastupd = 0
+        while watching:
+            if lastsslot[0] != "0":
+                upd = os.stat(getsavefile(lastsslot[0])).st_mtime
+                if upd != lastupd:
+                    utils.runcb("save",lastsslot[0])
+                lastupd = upd            
+    except:
+        print("Cannot find file for save slot - check path in settings.json",lastsslot[0])
+        watching=False
+    time.sleep(settings["savedelay"])
+watchsave()
 
 # Handle zone changes
 lastzone = "Unknown"
@@ -82,6 +123,7 @@ def checkzonechange(l):
     zc = re.match(r'Loading Scene(.*)', l)
     if zc:
         lastzone = zc.group(1).strip()
+        checklastsslot()
         utils.runcb("zone",lastzone)
     else:
         pass
