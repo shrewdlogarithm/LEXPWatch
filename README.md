@@ -21,13 +21,16 @@ I've included the path for Linux installs but I don't have a way to test that so
 
 ### Options ###
 The first run will create 'settings.json' - that contains a few options
-*ledir - the path to your Last Epoch save folder (Player.log file stored in there)
-*zonedelay - how often to check for zone changes
-*savedelay - how often to check your savefile 
-*quitdelay - how often to check to see if the program ended (not currently implemented!)
 
-'delays' should always be at least 1 (they're in seconds) - anything lower will waste CPU doing nothing...
+* ledir - the path to your Last Epoch save folder (Player.log file stored in there)
+* zonedelay - how often to check for zone changes
+* savedelay - how often to check your savefile 
+* quitdelay - how often to check to see if the program ended (not currently implemented!)
+
+Delay numbers should always be at least 1 (they're in seconds) - anything lower will waste CPU doing nothing...
 
 ### It's not working/I'd like different stats/Help! ###
 
-Fire an Issue and I'll try to help!
+I've deliberately not added a tonne of validation or error trapping - please report what you see via an Issue and I'll chase it down tho
+
+Also feel-free to raise Issues with ideas or suggestions!!
