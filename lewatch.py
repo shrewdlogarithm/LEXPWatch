@@ -20,8 +20,9 @@ def checkchar(last,slot,timenow):
             totalxp = lefuncs.levelxp[last[1]]-last[2]+charxp
     return currcharname,level,charxp,intvl,totalxp
 
+overprint = False
 lastzone = [0,0,0]
-def newzone(zone):
+def newzone(zones):
     global lastzone,overprint
     try:
         timenow = datetime.now()
@@ -31,14 +32,14 @@ def newzone(zone):
             lp = charxp/(lefuncs.levelxp[level]/100)
             pl = totalxp/intvl*60*60/lefuncs.levelxp[level]
             if overprint:
-                print("\n")
+                print("")
                 overprint = False
-            print(timenow.strftime('%Y-%m-%d %H:%M:%S')," - ", zone.ljust(12," "), " - ", currcharname, "(", level, "+", "%.1f" % lp, "%) Earned ", totalxp, "xp in ", "%.2f" % intvl, "secs @", xppm, "xp/min ", "@", "%.1f" % pl,"lvl/hr",sep="")
+            print(f"{timenow:%Y-%m-%d %H:%M:%S} - {currcharname}({level}+{lp:.1f}%) - {zones[0]:12} - {totalxp}xp in {intvl}secs = {xppm}xp/min {pl:.1f}lvl/hr",sep="")
         lastzone=[timenow,level,charxp]
     except lefuncs.FileClashException as e:
         pass # likely trying to read file whilst game is writing it
 utils.addcb("zone",newzone)
-newzone("Initialize")
+newzone([])
 
 ccxp=0
 ccplaytime=0
@@ -56,7 +57,10 @@ def trackchar(sslot):
                 if totalxp > 0:
                     ccxp += totalxp
                     ccplaytime += intvl
-                    print(timenow.strftime('%Y-%m-%d %H:%M:%S'),currcharname,ccxp,ccplaytime,"%8d" % (ccxp/ccplaytime*60*60),"xp/hr", end='\r')
+                    lp = charxp/(lefuncs.levelxp[level]/100)
+                    ph = (ccxp/ccplaytime*60*60)
+                    pl = ph/lefuncs.levelxp[level]
+                    print(f"{timenow:%Y-%m-%d %H:%M:%S} - {currcharname}({level}+{lp:.1f}%) - {ph:8.0f}xp/hr {pl:.1f}lvl/hr",sep="",end='\r')
                     overprint = True
         lastchar = [timenow,level,charxp,currcharname]
     except lefuncs.FileClashException as e:

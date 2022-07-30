@@ -125,9 +125,10 @@ def checkzonechange(l):
     global lastzone
     zc = re.match(r'Loading Scene(.*)', l)
     if zc:
+        zones = [lastzone,zc.group(1).strip()]
         lastzone = zc.group(1).strip()
         checklastsslot()
-        utils.runcb("zone",lastzone)
+        utils.runcb("zone",zones)
     else:
         pass
 utils.addcb("log",checkzonechange)
