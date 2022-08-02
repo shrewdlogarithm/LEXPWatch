@@ -26,3 +26,4 @@ dist/*
 
 settings.json
 *.txt
+*.log

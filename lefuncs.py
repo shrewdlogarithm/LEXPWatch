@@ -97,10 +97,10 @@ def watchlog():
                 else:
                     firstime = False
                 sline = f.tell() # move pointer to EOF
-                time.sleep(settings["zonedelay"])
+                f.close()                
         except Exception as e:
             print("Error in watchlog",e,type(e))
-            time.sleep(1)
+        time.sleep(settings["zonedelay"])
 watchlog() 
 
 @utils.background
