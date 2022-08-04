@@ -26,11 +26,8 @@ def save_settings():
         json.dump(settings,f,indent=4)
 save_settings()
 
-testfile = False
-if os.path.exists("testchar.txt"):
-    testfile = True
 def getsavefile(sslot):
-    if testfile:
+    if os.path.exists("testchar.txt"):
         return "testchar.txt"
     else:
         return settings["ledir"] + "/Saves/1CHARACTERSLOT_BETA_" + sslot    

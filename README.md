@@ -1,51 +1,49 @@
-## LEXPWatch - XP monitoring for Last Epoch ##
+## LEXPWatch - Progress monitoring for Last Epoch ##
 
 This is VERY much work-in-progress - sharing for feedback/ideas!
 
-### What it Does ###
-It monitors your Player.log/save slots and reports how much XP you're earning when playing and specifically in each 'area' you enter/leave
+### What does it do? ###
+It monitors how much XP you're earning over time and per-zone - it  also reports Stability gains from Monolith Echoes
 
 ### Sample Output ###
-This is a zone-change message
+Zone-Change
 
-`2022-07-25 20:54:52 - EoT          - Thymp(78+46.6%) Earned 31601xp in 75.00secs @25280xp/min @1.0lvl/hr`
+`2022-08-02 13:02:45 - MrsStabby(80+35.9%) - M_M150       - 156004xp in 120secs = 78002xp/min 2.6lvl/hr  - Timeline: 9 Stability change from [233] to [266]`
 
-Character Thymp Level 78, 46.6% of the way to Level 79 - earned 21601 XP in the last area (EoT is 'End of Time' where I've just arrived) at the rates shown
+Character "MrsStabby" Level 80 and 35.9% of the way to 81 earned 156004 XP in 120 seconds in area 'M_M150' (a Monolith Echo)
+XP/min and lvl/hr are calculated 
+Timeline Stability change is also reported
 
-This is an ongoing XP earned message (Work in Progress - suggestions welcome!)
+Ongoing XP earned (updated "live" as you're playing)
 
-`2022-07-25 20:54:52 Thymp 486028 802  2181671 xp/hr`
-
-Character Thymp has earned 486028XP in 802 seconds which is 2181671xp/hr
+`MrsStabby(80+35.9%) -  5400138xp/hr 3.0lvl/hr`
 
 *Note: This counts time spent in areas where you earned XP - it ignores time spent in hubs where no XP was earned*
 
-### How it does it ###
-Python Code - I've tried to avoid using external dependencies - I think it should 'just work'
+### How do I run it? ###
+You'll need Python (3.6 or higher) installed - Linux normally has it, it's pretty easy to install in Windows these days too!
 
-It monitors "Player.log" which is updated each time you change zone - the zone names are internal mapnames but it's easy to see what they mean.
+Clone or download this repository (you only need the 3 .py files) and run "python lewatch.py"
 
-It also monitors your more recently updated Saveslot file (last character played?) to see if you've gained XP or Levels
-|
-### How to Use ###
-Clone the repo and run lewatch.py - it runs forever, Ctrl-Break to halt it.
+Output goes to the console but also saved to "slot?.log" for each saveslot which has been monitored
 
-Output goes to console - redirect it to a file if you'd prefer!
+### How does it work? ###
+It monitors the "Player.log" file which is updated each time you change zone 
 
-I've included the path for Linux installs but I don't have a way to test that so feedback apprec on that too!
+It also monitors your saveslot files to see if you've gained XP or Levels
 
 ### Options ###
-The first run will create 'settings.json' - that contains a few options
+First time you run it, it creates a file 'settings.json' which contains the default options
 
-* ledir - the path to your Last Epoch save folder (Player.log file stored in there)
+* ledir - the path to your Last Epoch save folder (Player.log file stored in there) - if it's not working, check this is correct!!
 * zonedelay - how often to check for zone changes
 * savedelay - how often to check your savefile 
 * quitdelay - how often to check to see if the program ended (not currently implemented!)
 
-Delay numbers should always be at least 1 (they're in seconds) - anything lower will waste CPU doing nothing...
+Delay numbers should always be at least 1 (they're in seconds) - anything lower will thrash your CPU for no good reason...
 
 ### It's not working/I'd like different stats/Help! ###
 
-I've deliberately not added a tonne of validation or error trapping - please report what you see via an Issue and I'll chase it down tho
+Feel-free to raise Issues with ideas or suggestions and I'll try to help
 
-Also feel-free to raise Issues with ideas or suggestions!!
+Thanks for reading this far!
