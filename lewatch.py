@@ -1,3 +1,5 @@
+# This code is scrappy and, yes, it uses too many Globals - it's quick and dirty - suggestions to improve welcome!!
+
 from datetime import datetime
 import time
 
@@ -5,9 +7,7 @@ print("Last Epoch Watcher Active")
 
 import lefuncs,utils
 
-def logname():
-    return f"slot{lefuncs.lastsslot[0]}.log"
-
+# Handle output to log file and console
 overprint = False
 def addlog(log,term):
     global overprint
@@ -21,11 +21,12 @@ def addlog(log,term):
         overprint = True
     print(log,sep="",end=endc)
     try:
-        with open(logname(),"a") as lf:
+        with open(f"slot{lefuncs.lastsslot[0]}.log","a") as lf:
             lf.write(log + "\n")
     except Exception as e:
         pass # may be read-only filesystem - no matter...
 
+# Handle ongolng XP calculation
 def checkchar(last,slot,timenow):
     chardb = lefuncs.getchardb(slot)
     currcharname = chardb["characterName"]
@@ -44,6 +45,7 @@ def checkchar(last,slot,timenow):
             totalxp = lefuncs.levelxp[last[1]]-last[2]+charxp
     return currcharname,level,charxp,intvl,totalxp,mrundb
 
+# Handle zone change calculations
 lastzone = [0,0,0]
 laststab = {}
 def newzone(zones):
@@ -64,9 +66,12 @@ def newzone(zones):
         lastzone=[timenow,level,charxp]
     except lefuncs.FileClashException as e:
         pass # likely trying to read file whilst game is writing it
+# Add this as a 'callback' to the monitoring function
 utils.addcb("zone",newzone)
+# Call it once to setup a 'before' zone - otherwise we'd have to zone twice to see a change...
 newzone([])
 
+# Monitor ongoing XP gains
 ccxp=0
 ccplaytime=0
 lastchar = [0,0,0,""]
@@ -90,9 +95,12 @@ def trackchar(sslot):
         lastchar = [timenow,level,charxp,currcharname]
     except lefuncs.FileClashException as e:
         pass # trying to read file whilst game is writing it
+# Add this as a 'callback' to the monitoring function
 utils.addcb("save",trackchar)
 
+# Loop quietly whilst background functions run
 while lefuncs.iswatching():
     time.sleep(lefuncs.settings["quitdelay"])
 
+# This is currently never reached as it runs until cancelled - we could pickup when you logout I guess???
 print("Last Epoch Watcher Ending...")

@@ -1,14 +1,16 @@
+# This code is scrappy and, yes, it uses too many Globals - it's quick and dirty - suggestions to improve welcome!!
+
 import glob,os,json,re,time
 import utils
 
 watching=True
 
 # Load/Initialize Settings
-path = os.getenv("USERPROFILE")
-if path: # Windows
+path = os.getenv("USERPROFILE") # should be the Windows AND Linux base path - Linux untested tho...
+if path: # we're on Windows
     path = path + "/appdata/locallow/"
-else:
-    path = os.getenv("HOME") + "/.config/unity3d/"
+else: # almost certainly Linux as LE doesn't run on OSX??
+    path = os.getenv("HOME") + "/.config/unity3d/" # this is untested as yet - I'm guessing at the Linux path here...
 settings = {
         "ledir": path + "/Eleventh Hour Games/Last Epoch/",
         "zonedelay": 5,
@@ -26,6 +28,7 @@ def save_settings():
         json.dump(settings,f,indent=4)
 save_settings()
 
+# Return saveslot file (testchar.txt used for testing without the game running/installed)
 def getsavefile(sslot):
     if os.path.exists("testchar.txt"):
         return "testchar.txt"
@@ -54,12 +57,12 @@ def checklastsslot():
     global lastsslot,watching
     mrecent = 0
     mrfile = "0"
-    f = glob.glob(settings["ledir"] + "Saves/1*")
-    for fl in f:
-        mtime = os.path.getmtime(fl)
+    slotfiles = glob.glob(settings["ledir"] + "Saves/1*")
+    for slotfile in slotfiles:
+        mtime = os.path.getmtime(slotfile)
         if mtime > mrecent:
             mrecent = mtime
-            mrfile = fl    
+            mrfile = slotfile    
     if mrfile != "0":
         lastsslot = [re.findall(r'\d+', mrfile)[-1],mrecent]
     else:
@@ -67,9 +70,11 @@ def checklastsslot():
         watching = False
 checklastsslot()
 
-# Monitor Log and Save Files
+# Used to keep the main program running - we never end so it's not really doing anything right now
 def iswatching():
     return watching
+
+# Monitor Player Log 
 @utils.background
 def watchlog():
     global watching
@@ -100,6 +105,7 @@ def watchlog():
         time.sleep(settings["zonedelay"])
 watchlog() 
 
+#Mionitor Saveslot
 @utils.background
 def watchsave():
     global watching
