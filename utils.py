@@ -1,4 +1,4 @@
-import threading
+import threading,json
 
 # Thread decorator
 def background(f):
@@ -16,3 +16,16 @@ def runcb(typ,para):
     if typ in cbdb:
         for f in cbdb[typ]:
             f(para)
+
+def loadjson(file,offset=0):
+    data = "{}"
+    try:
+        with open(file,"r") as f:
+            data = f.read()[offset:]
+    except Exception as e:
+        pass # may not yet exist
+    return json.loads(data)
+        
+def savejson(file,data):
+    with open(file,"w") as f:
+        json.dump(data,f,indent=4)
