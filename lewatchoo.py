@@ -2,7 +2,7 @@
 
 import time,os,glob,re,utils
 from datetime import datetime
-from lefuncs import levelxp
+from ledata import levelxp
 
 class FileClashException(Exception):
     def __init__(self, message='Key Empty'):
@@ -77,6 +77,7 @@ class LEWatch:
 
     # Handle zone changes
     lastzonename = "Unknown"
+
     def checkzonechange(self,l):
         zc = re.match(r'Loading Scene(.*)', l)
         if zc:
