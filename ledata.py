@@ -1,3 +1,34 @@
+import os,glob,re
+
+def lepath():
+    path = os.getenv("USERPROFILE") # should be the Windows AND Linux base path - Linux untested tho...
+    if path: # we're on Windows
+        return path + "/appdata/locallow/"
+    else: # almost certainly Linux as LE doesn't run on OSX??
+        return os.getenv("HOME") + "/.config/unity3d/" # this is untested as yet - I'm guessing at the Linux path here...
+
+# Find last played character slot
+def findlastsslot(path): 
+    mrecent = 0
+    mrfile = "0"
+    slotfiles = glob.glob(path + "Saves/1*")
+    for slotfile in slotfiles:
+        mtime = os.path.getmtime(slotfile)
+        if mtime > mrecent:
+            mrecent = mtime
+            mrfile = slotfile    
+    if mrfile != "0":
+        return re.findall(r'\d+', mrfile)[-1]
+    else:
+        return None
+        
+# Return saveslot file (testchar.txt used for testing without the game running/installed)
+def filenameforslot(path,sslot):
+    if os.path.exists("testchar.txt"):
+        return "testchar.txt"
+    else:
+        return path + "/Saves/1CHARACTERSLOT_BETA_" + sslot    
+
 # Level XP Table
 levelxp = [
     0,
